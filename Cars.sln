@@ -3,12 +3,14 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29503.13
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cars", "Cars\Cars.csproj", "{B8D24BB1-1E4F-4D88-83E9-E46497E60872}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cars.MVC", "Cars.MVC\Cars.MVC.csproj", "{B8D24BB1-1E4F-4D88-83E9-E46497E60872}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E4D2375B-93E1-4638-8385-B65554FFFAD0}"
 	ProjectSection(SolutionItems) = preProject
 		README.md = README.md
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cars.Service", "Cars.Service\Cars.Service.csproj", "{8C556B18-0D87-47BA-8D79-B91F74C5284A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -20,6 +22,10 @@ Global
 		{B8D24BB1-1E4F-4D88-83E9-E46497E60872}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B8D24BB1-1E4F-4D88-83E9-E46497E60872}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B8D24BB1-1E4F-4D88-83E9-E46497E60872}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8C556B18-0D87-47BA-8D79-B91F74C5284A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8C556B18-0D87-47BA-8D79-B91F74C5284A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8C556B18-0D87-47BA-8D79-B91F74C5284A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8C556B18-0D87-47BA-8D79-B91F74C5284A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
