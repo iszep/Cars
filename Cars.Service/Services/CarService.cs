@@ -17,9 +17,20 @@ namespace Cars.Service.Services
             _db = db;
         }
 
+        public Task<int> GetVehicleMakesCount()
+        {
+            return _db.VehicleMakes.CountAsync();
+        }
+
         public async Task<IEnumerable<VehicleMake>> GetVehicleMakeAsync()
         {
             var vehicleMakes = await _db.VehicleMakes.ToListAsync();
+            return vehicleMakes;
+        }
+
+        public async Task<IEnumerable<VehicleMake>> GetVehicleMakesPagedAsync(int page, int pageSize)
+        {
+            var vehicleMakes = await _db.VehicleMakes.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
             return vehicleMakes;
         }
 
@@ -63,6 +74,14 @@ namespace Cars.Service.Services
             return numberOfDeleted;
             
         }
+        public async Task<IEnumerable<VehicleModel>> GetVehicleModelAsync(int makeId)
+        {
 
+            var vehicleModel = await _db.VehicleModels.Where(x => x.MakeId == makeId).ToListAsync();
+            return vehicleModel;
+
+        }
+
+      
     }
 }

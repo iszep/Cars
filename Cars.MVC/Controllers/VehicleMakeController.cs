@@ -16,6 +16,7 @@ namespace Cars.Controllers
     {
 
         private readonly ICarService _carService;
+        private readonly int _pageSize = 5;
 
         public VehicleMakeController(ICarService carService)
         {
@@ -30,6 +31,33 @@ namespace Cars.Controllers
             return View(await carMakes);
         }
 
+        public async Task<IActionResult> PagedIndex(int currentPage = 1)
+        {
+            ViewBag.CurrentPage = currentPage;
+            var carMakes = _carService.GetVehicleMakesPagedAsync(currentPage, _pageSize);
+            return View(await carMakes);
+        }
+
+        public async Task<IActionResult> Next (int currentPage)
+        {
+            var page = currentPage;
+            var count = await _carService.GetVehicleMakesCount();
+            if ( (currentPage + 1 ) * _pageSize <= count)
+            {
+                page += 1;
+            }
+            return RedirectToAction("PagedIndex", new { currentPage = page });
+        }
+
+        public async Task<IActionResult> Previous(int currentPage)
+        {
+            var page = currentPage;
+            if (currentPage > 1)
+            {
+                page--;
+                                }
+            return RedirectToAction("PagedIndex", new { currentPage = page });
+        }
         // GET: VehicleMakes/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -148,6 +176,7 @@ namespace Cars.Controllers
         // POST: VehicleMakes/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        //[HttpDelete]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var vehicleMake = await _carService.DeleteVehicleMakeAsync(id);

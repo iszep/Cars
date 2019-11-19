@@ -10,6 +10,8 @@ namespace Cars.Service.Interfaces
     public interface ICarService
     {
         Task<IEnumerable<VehicleMake>> GetVehicleMakeAsync();
+        Task<IEnumerable<VehicleMake>> GetVehicleMakesPagedAsync(int page, int pageSize);
+        Task<int> GetVehicleMakesCount();     
         Task<VehicleMake> GetVehicleMakeAsync(int? id);
         Task<int> CreateVehicleMakeAsync(VehicleMake vehicleMake);
         Task<VehicleMake> FindVehicleMakeAsync(int? id);
