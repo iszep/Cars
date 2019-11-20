@@ -7,16 +7,19 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Cars.Service.Data;
 using Cars.Service.Models;
+using Cars.Service.Interfaces;
 
 namespace Cars.Controllers
 {
     public class VehicleModelController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly ICarService _carService;
 
-        public VehicleModelController(ApplicationDbContext context)
+        public VehicleModelController(ApplicationDbContext context, ICarService carService)
         {
             _context = context;
+            _carService = carService;
         }
 
         // GET: VehicleModels
@@ -24,9 +27,9 @@ namespace Cars.Controllers
         {
 
             ViewBag.MakeId = makeId;
-            var applicationDbContext = _context.VehicleModels.Where(x => x.MakeId == makeId).Include(v => v.VehicleMake);
-            //var applicationDbContext = _context.VehicleModels.Include(v => v.VehicleMake);
-            return View(await applicationDbContext.ToListAsync());
+            var vehicleModels = await _carService.GetVehicleModelsAsync(makeId);
+            return View(vehicleModels);
+            
         }
 
         // GET: VehicleModels/Details/5
@@ -37,9 +40,7 @@ namespace Cars.Controllers
                 return NotFound();
             }
 
-            var vehicleModel = await _context.VehicleModels
-                .Include(v => v.VehicleMake)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var vehicleModel = await _carService.GetVehicleModelAsync(id);
             if (vehicleModel == null)
             {
                 return NotFound();
@@ -51,7 +52,7 @@ namespace Cars.Controllers
         // GET: VehicleModels/Create
         public IActionResult Create(int makeId)
         {
-            //ViewData["MakeId"] = new SelectList(_context.VehicleMakes, "Id", "Abrv");
+            
             var vehicleModel = new VehicleModel { MakeId = makeId };
             return View(vehicleModel);
         }
@@ -65,7 +66,7 @@ namespace Cars.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(vehicleModel);
+                var numberOfSaves = await _carService.CreateVehicleModelAsync(vehicleModel);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index), new { makeId = vehicleModel.MakeId });
             }
@@ -76,17 +77,25 @@ namespace Cars.Controllers
         // GET: VehicleModels/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
+            
             if (id == null)
             {
                 return NotFound();
             }
 
-            var vehicleModel = await _context.VehicleModels.FindAsync(id);
+            
+           
+            var vehicleModel = await _carService.FindVehicleModelAsync(id);
+            var vehicleMake = await _carService.FindVehicleMakeAsync(vehicleModel.MakeId);
+            ViewBag.VehicleMakeName = vehicleMake.Name;
+
+
             if (vehicleModel == null)
             {
                 return NotFound();
             }
-            ViewData["MakeId"] = new SelectList(_context.VehicleMakes, "Id", "Abrv", vehicleModel.MakeId);
+            
+            //ViewData["MakeId"] = new SelectList(vehicleMake, "Id", "Abrv", vehicleModel.MakeId);
             return View(vehicleModel);
         }
 
@@ -97,6 +106,7 @@ namespace Cars.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Abrv,MakeId")] VehicleModel vehicleModel)
         {
+            
             if (id != vehicleModel.Id)
             {
                 return NotFound();
@@ -106,8 +116,9 @@ namespace Cars.Controllers
             {
                 try
                 {
-                    _context.Update(vehicleModel);
-                    await _context.SaveChangesAsync();
+                    
+                    await _carService.UpdateVehicleModelAsync(vehicleModel);
+                    
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -120,10 +131,13 @@ namespace Cars.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index), new { makeId = vehicleModel.MakeId });
+
             }
-            ViewData["MakeId"] = new SelectList(_context.VehicleMakes, "Id", "Abrv", vehicleModel.MakeId);
+            //var vehicleMake = await _carService.GetVehicleMakeAsync();
+            
             return View(vehicleModel);
+            
         }
 
         // GET: VehicleModels/Delete/5
@@ -134,9 +148,8 @@ namespace Cars.Controllers
                 return NotFound();
             }
 
-            var vehicleModel = await _context.VehicleModels
-                .Include(v => v.VehicleMake)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var vehicleModel = await _carService.FindVehicleModelAsync(id);                
+                
             if (vehicleModel == null)
             {
                 return NotFound();
@@ -148,17 +161,21 @@ namespace Cars.Controllers
         // POST: VehicleModels/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(int id, [Bind("Id,Name,Abrv,MakeId")] VehicleModel vehicleModel)
         {
-            var vehicleModel = await _context.VehicleModels.FindAsync(id);
-            _context.VehicleModels.Remove(vehicleModel);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            
+            
+                 await _carService.DeleteVehicleModelAsync(id);
+
+               return RedirectToAction(nameof(Index), new { makeId = vehicleModel.MakeId});
+
         }
 
         private bool VehicleModelExists(int id)
         {
             return _context.VehicleModels.Any(e => e.Id == id);
         }
+
+       
     }
 }

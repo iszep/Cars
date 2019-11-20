@@ -28,6 +28,12 @@ namespace Cars.Service.Services
             return vehicleMakes;
         }
 
+        public async Task<IEnumerable<VehicleModel>> GetVehicleModelsAsync(int makeId)
+        {
+            var vehicleModels = await _db.VehicleModels.Where(x => x.MakeId == makeId).Include(v => v.VehicleMake).ToListAsync();
+            return vehicleModels;
+        }
+
         public async Task<IEnumerable<VehicleMake>> GetVehicleMakesPagedAsync(int page, int pageSize)
         {
             var vehicleMakes = await _db.VehicleMakes.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
@@ -82,6 +88,40 @@ namespace Cars.Service.Services
 
         }
 
-      
+        public async Task<VehicleModel> GetVehicleModelAsync(int? id)
+        {
+            var vehicleModel = await _db.VehicleModels
+               .Include(v => v.VehicleMake)
+               .FirstOrDefaultAsync(m => m.Id == id);
+            return vehicleModel;
+        }
+
+        public async Task<int> CreateVehicleModelAsync(VehicleModel vehicleModel)
+        {
+            _db.Add(vehicleModel);
+            var numberOfCreated = await _db.SaveChangesAsync();
+            return numberOfCreated;
+        }
+
+        public async Task<VehicleModel> FindVehicleModelAsync(int? id)
+        {
+            var vehicleModel = await _db.VehicleModels.FindAsync(id);
+            return vehicleModel;
+        }
+
+        public async Task<int> UpdateVehicleModelAsync(VehicleModel vehicleModel)
+        {
+            _db.Update(vehicleModel);
+           var numberOfChanges = await _db.SaveChangesAsync();
+            return numberOfChanges;
+        }
+
+        public async Task<int> DeleteVehicleModelAsync(int? id)
+        {
+            var vehicleModel = await _db.VehicleModels.FindAsync(id);
+            _db.VehicleModels.Remove(vehicleModel);
+            var numberOfDeleted = await _db.SaveChangesAsync();
+            return numberOfDeleted;
+        }
     }
 }

@@ -9,6 +9,7 @@ namespace Cars.Service.Interfaces
 {
     public interface ICarService
     {
+        // Car Makes
         Task<IEnumerable<VehicleMake>> GetVehicleMakeAsync();
         Task<IEnumerable<VehicleMake>> GetVehicleMakesPagedAsync(int page, int pageSize);
         Task<int> GetVehicleMakesCount();     
@@ -18,5 +19,14 @@ namespace Cars.Service.Interfaces
         Task<int> UpdateVehicleMakeAsync(VehicleMake vehicleMake);
         bool VehicleMakeExists(int id);
         Task<int> DeleteVehicleMakeAsync(int? id);
+
+        // Car Models
+        Task<IEnumerable<VehicleModel>> GetVehicleModelsAsync(int makeId);
+        Task<VehicleModel> GetVehicleModelAsync(int? id);
+        Task<int> CreateVehicleModelAsync(VehicleModel vehicleModel);
+        Task<VehicleModel> FindVehicleModelAsync(int? id);
+        Task<int> UpdateVehicleModelAsync(VehicleModel vehicleModel);
+        Task<int> DeleteVehicleModelAsync(int? id);
+
     }
 }
