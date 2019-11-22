@@ -24,12 +24,21 @@ namespace Cars.Controllers
             _carService = carService;
         }     
 
-        public async Task<IActionResult> Index(string sortBy, int currentPage = 1)
+        public async Task<IActionResult> Index(string sortBy, string searchString, int currentPage = 1)
         {
+           
+            
+            //searchString = "test";
             ViewBag.NameSortParm = String.IsNullOrEmpty(sortBy) ? "Name_desc" : "";
             ViewBag.AbrvSortParm = String.IsNullOrEmpty(sortBy) ? "Abrv_desc" : "";
             ViewBag.CurrentPage = currentPage;
-            var vehicleMakes = await _carService.GetVehicleMakesPagedAsync(currentPage, _pageSize);
+            ViewBag.SearchString = searchString;
+            var vehicleMakes = await _carService.GetVehicleMakesPagedAsync(currentPage, _pageSize, searchString);
+            //if (!String.IsNullOrEmpty(searchString))
+            //{
+            //    vehicleMakes = vehicleMakes.Where(s => s.Name.Contains(searchString)
+            //                           || s.Abrv.Contains(searchString));
+            //}
             switch (sortBy)
             {
                 case "Name_desc":
@@ -45,7 +54,13 @@ namespace Cars.Controllers
             return View(vehicleMakes);
         }
 
-        public async Task<IActionResult> Next (int currentPage)
+        [HttpPost]
+        public IActionResult Search([Bind("SearchString")] string searchString)
+        {
+            return RedirectToAction("Index", new { currentPage = 1, searchString });
+        }
+
+        public async Task<IActionResult> Next ([Bind("SearchString")] string searchString, int currentPage)
         {
             var page = currentPage;
             var count = await _carService.GetVehicleMakesCount();
@@ -53,7 +68,7 @@ namespace Cars.Controllers
             {
                 page += 1;
             }
-            return RedirectToAction("Index", new { currentPage = page });
+            return RedirectToAction("Index", new { currentPage = page, searchString });
         }
 
         public async Task<IActionResult> Previous(int currentPage)

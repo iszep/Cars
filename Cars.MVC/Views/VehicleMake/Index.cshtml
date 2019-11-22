@@ -8,6 +8,14 @@
 
 <p>
     <a asp-action="Create">Create New</a>
+    <form method="post">
+        <p>
+            Find by name:
+            <input type="text" class="form-control" placeholder="Enter  make name" name="SearchString" maxlength="20" value="@ViewBag.SearchString"/>
+            <button type="submit" asp-action="Search">Search</button>
+        </p>
+    </form>
+
 </p>
 <table class="table">
     <thead>
@@ -15,7 +23,7 @@
             <th>
                 @Html.ActionLink("Name", "Index", new { sortBy = ViewBag.NameSortParm })
             </th>
-          
+
             <th>
                 @Html.ActionLink("Abrv", "Index", new { sortBy = ViewBag.AbrvSortParm })
             </th>
@@ -25,29 +33,30 @@
 
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Abrv)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-                <a asp-controller="VehicleModel" asp-action="Index" asp-route-makeId="@item.Id">Models</a>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Abrv)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    <a asp-controller="VehicleModel" asp-action="Index" asp-route-makeId="@item.Id" asp-route-searhString="">Models</a>
 
-                
 
-            </td>
-        </tr>
-}
+
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
 <form>
     <a class="btn btn-dark float-left" asp-action="Previous" asp-route-currentPage="@ViewBag.CurrentPage">Previous</a>
-    <a class="btn btn-dark float-right" asp-action="Next" asp-route-currentPage="@ViewBag.CurrentPage">Next</a>
+    <a class="btn btn-dark float-right" asp-action="Next" asp-route-currentPage="@ViewBag.CurrentPage" asp-route-searchString="@ViewBag.SearchString">Next</a>
 
 </form>

@@ -35,9 +35,15 @@ namespace Cars.Service.Services
             return vehicleModels;
         }
 
-        public async Task<IEnumerable<VehicleMake>> GetVehicleMakesPagedAsync(int page, int pageSize)
+        public async Task<IEnumerable<VehicleMake>> GetVehicleMakesPagedAsync(int page, int pageSize, string searchString)
         {
-            var vehicleMakes = await _db.VehicleMakes.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+            var query = _db.VehicleMakes.Where(x => true);
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                query = query.Where(x => x.Name.Contains(searchString));
+            }
+            var vehicleMakes = await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+            //var vehicleMakes = await _db.VehicleMakes.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
             return vehicleMakes;
         }
 
@@ -129,6 +135,11 @@ namespace Cars.Service.Services
         {
             return _db.VehicleModels.Any(e => e.Id == id);
         }
+        //public async Task<VehicleMake> FilterVehicleMake()
+        //{
+        //    var vehicleMakes = await _db.VehicleMakes.Where(s => s.Name.Contains(searchString)
+        //                               || s.Abrv.Contains(searchString));
+        //}
 
        
     }

@@ -11,7 +11,7 @@ namespace Cars.Service.Interfaces
     {
         // Car Makes
         Task<IEnumerable<VehicleMake>> GetVehicleMakeAsync();
-        Task<IEnumerable<VehicleMake>> GetVehicleMakesPagedAsync(int page, int pageSize);
+        Task<IEnumerable<VehicleMake>> GetVehicleMakesPagedAsync(int page, int pageSize, string searchString);
         Task<int> GetVehicleMakesCount();     
         Task<VehicleMake> GetVehicleMakeAsync(int? id);
         Task<int> CreateVehicleMakeAsync(VehicleMake vehicleMake);
