@@ -22,15 +22,14 @@ namespace Cars.Controllers
         {
 
             _carService = carService;
-        }
+        }     
 
-        // GET: VehicleMakes
-        public async Task<IActionResult> Index(string sortBy)
+        public async Task<IActionResult> Index(string sortBy, int currentPage = 1)
         {
             ViewBag.NameSortParm = String.IsNullOrEmpty(sortBy) ? "Name_desc" : "";
             ViewBag.AbrvSortParm = String.IsNullOrEmpty(sortBy) ? "Abrv_desc" : "";
-            var vehicleMakes = await _carService.GetVehicleMakeAsync();
-           
+            ViewBag.CurrentPage = currentPage;
+            var vehicleMakes = await _carService.GetVehicleMakesPagedAsync(currentPage, _pageSize);
             switch (sortBy)
             {
                 case "Name_desc":
@@ -43,14 +42,7 @@ namespace Cars.Controllers
                     vehicleMakes = vehicleMakes.OrderBy(s => s.Name);
                     break;
             }
-            return View(vehicleMakes.ToList());
-        }
-
-        public async Task<IActionResult> PagedIndex(int currentPage = 1)
-        {
-            ViewBag.CurrentPage = currentPage;
-            var carMakes = _carService.GetVehicleMakesPagedAsync(currentPage, _pageSize);
-            return View(await carMakes);
+            return View(vehicleMakes);
         }
 
         public async Task<IActionResult> Next (int currentPage)
@@ -61,7 +53,7 @@ namespace Cars.Controllers
             {
                 page += 1;
             }
-            return RedirectToAction("PagedIndex", new { currentPage = page });
+            return RedirectToAction("Index", new { currentPage = page });
         }
 
         public async Task<IActionResult> Previous(int currentPage)
@@ -71,7 +63,7 @@ namespace Cars.Controllers
             {
                 page--;
                                 }
-            return RedirectToAction("PagedIndex", new { currentPage = page });
+            return RedirectToAction("Index", new { currentPage = page });
         }
         // GET: VehicleMakes/Details/5
         public async Task<IActionResult> Details(int? id)
