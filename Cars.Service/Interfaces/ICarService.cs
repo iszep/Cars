@@ -27,6 +27,7 @@ namespace Cars.Service.Interfaces
         Task<VehicleModel> FindVehicleModelAsync(int? id);
         Task<int> UpdateVehicleModelAsync(VehicleModel vehicleModel);
         Task<int> DeleteVehicleModelAsync(int? id);
+        bool VehicleModelExists(int? id);
 
     }
 }

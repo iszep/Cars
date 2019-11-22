@@ -25,10 +25,25 @@ namespace Cars.Controllers
         }
 
         // GET: VehicleMakes
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string sortBy)
         {
-            var carMakes = _carService.GetVehicleMakeAsync();
-            return View(await carMakes);
+            ViewBag.NameSortParm = String.IsNullOrEmpty(sortBy) ? "Name_desc" : "";
+            ViewBag.AbrvSortParm = String.IsNullOrEmpty(sortBy) ? "Abrv_desc" : "";
+            var vehicleMakes = await _carService.GetVehicleMakeAsync();
+           
+            switch (sortBy)
+            {
+                case "Name_desc":
+                    vehicleMakes = vehicleMakes.OrderByDescending(s => s.Name);
+                    break;
+                case "Abrv_desc":
+                    vehicleMakes = vehicleMakes.OrderByDescending(s => s.Abrv);
+                    break;
+                default:
+                    vehicleMakes = vehicleMakes.OrderBy(s => s.Name);
+                    break;
+            }
+            return View(vehicleMakes.ToList());
         }
 
         public async Task<IActionResult> PagedIndex(int currentPage = 1)

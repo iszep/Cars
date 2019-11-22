@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Cars.Service.Data;
 using Cars.Service.Interfaces;
 using Cars.Service.Models;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace Cars.Service.Services
@@ -123,5 +124,12 @@ namespace Cars.Service.Services
             var numberOfDeleted = await _db.SaveChangesAsync();
             return numberOfDeleted;
         }
+
+        public bool VehicleModelExists(int? id)
+        {
+            return _db.VehicleModels.Any(e => e.Id == id);
+        }
+
+       
     }
 }

@@ -13,12 +13,10 @@ namespace Cars.Controllers
 {
     public class VehicleModelController : Controller
     {
-        private readonly ApplicationDbContext _context;
-        private readonly ICarService _carService;
+         private readonly ICarService _carService;
 
-        public VehicleModelController(ApplicationDbContext context, ICarService carService)
-        {
-            _context = context;
+        public VehicleModelController(ICarService carService)
+        {           
             _carService = carService;
         }
 
@@ -28,6 +26,7 @@ namespace Cars.Controllers
 
             ViewBag.MakeId = makeId;
             var vehicleModels = await _carService.GetVehicleModelsAsync(makeId);
+
             return View(vehicleModels);
             
         }
@@ -66,8 +65,7 @@ namespace Cars.Controllers
         {
             if (ModelState.IsValid)
             {
-                var numberOfSaves = await _carService.CreateVehicleModelAsync(vehicleModel);
-                await _context.SaveChangesAsync();
+                var numberOfSaves = await _carService.CreateVehicleModelAsync(vehicleModel);                
                 return RedirectToAction(nameof(Index), new { makeId = vehicleModel.MakeId });
             }
             //ViewData["MakeId"] = new SelectList(_context.VehicleMakes, "Id", "Abrv", vehicleModel.MakeId);
@@ -93,9 +91,8 @@ namespace Cars.Controllers
             if (vehicleModel == null)
             {
                 return NotFound();
-            }
+            }            
             
-            //ViewData["MakeId"] = new SelectList(vehicleMake, "Id", "Abrv", vehicleModel.MakeId);
             return View(vehicleModel);
         }
 
@@ -173,7 +170,8 @@ namespace Cars.Controllers
 
         private bool VehicleModelExists(int id)
         {
-            return _context.VehicleModels.Any(e => e.Id == id);
+            _carService.VehicleModelExists(id);
+            return true;
         }
 
        

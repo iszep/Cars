@@ -13,13 +13,16 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Name)
+                @Html.ActionLink("Name", "Index", new { sortBy = ViewBag.NameSortParm })
             </th>
+          
             <th>
-                @Html.DisplayNameFor(model => model.Abrv)
+                @Html.ActionLink("Abrv", "Index", new { sortBy = ViewBag.AbrvSortParm })
             </th>
             <th></th>
         </tr>
+
+
     </thead>
     <tbody>
 @foreach (var item in Model) {
