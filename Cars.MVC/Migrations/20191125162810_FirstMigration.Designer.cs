@@ -7,11 +7,11 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
-namespace Cars.Migrations
+namespace Cars.MVC.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20191118164615_InitialMigration")]
-    partial class InitialMigration
+    [Migration("20191125162810_FirstMigration")]
+    partial class FirstMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -21,7 +21,7 @@ namespace Cars.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("Cars.Models.VehicleMake", b =>
+            modelBuilder.Entity("Cars.Service.Models.VehicleMake", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -41,7 +41,7 @@ namespace Cars.Migrations
                     b.ToTable("VehicleMakes");
                 });
 
-            modelBuilder.Entity("Cars.Models.VehicleModel", b =>
+            modelBuilder.Entity("Cars.Service.Models.VehicleModel", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -266,9 +266,9 @@ namespace Cars.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("Cars.Models.VehicleModel", b =>
+            modelBuilder.Entity("Cars.Service.Models.VehicleModel", b =>
                 {
-                    b.HasOne("Cars.Models.VehicleMake", "VehicleMake")
+                    b.HasOne("Cars.Service.Models.VehicleMake", "VehicleMake")
                         .WithMany("VehicleModels")
                         .HasForeignKey("MakeId")
                         .OnDelete(DeleteBehavior.Cascade)

@@ -14,6 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Cars.Service.Services;
 using Cars.Service.Interfaces;
+using AutoMapper;
 
 namespace Cars
 {
@@ -37,6 +38,7 @@ namespace Cars
             services.AddControllersWithViews();
             services.AddRazorPages();
             services.AddTransient<ICarService,CarService>();
+            services.AddAutoMapper(typeof(Startup));
             //services.AddTransient<ICarService, FakeCarService>();
         }
 

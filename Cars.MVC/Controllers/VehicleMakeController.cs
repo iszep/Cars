@@ -9,6 +9,7 @@ using Cars.Service.Data;
 using Cars.Service.Models;
 using Cars.Service.Services;
 using Cars.Service.Interfaces;
+using Cars.Service.Dtos;
 
 namespace Cars.Controllers
 {
@@ -22,23 +23,16 @@ namespace Cars.Controllers
         {
 
             _carService = carService;
-        }     
+        }
 
         public async Task<IActionResult> Index(string sortBy, string searchString, int currentPage = 1)
         {
-           
-            
-            //searchString = "test";
             ViewBag.NameSortParm = String.IsNullOrEmpty(sortBy) ? "Name_desc" : "";
             ViewBag.AbrvSortParm = String.IsNullOrEmpty(sortBy) ? "Abrv_desc" : "";
             ViewBag.CurrentPage = currentPage;
             ViewBag.SearchString = searchString;
             var vehicleMakes = await _carService.GetVehicleMakesPagedAsync(currentPage, _pageSize, searchString);
-            //if (!String.IsNullOrEmpty(searchString))
-            //{
-            //    vehicleMakes = vehicleMakes.Where(s => s.Name.Contains(searchString)
-            //                           || s.Abrv.Contains(searchString));
-            //}
+
             switch (sortBy)
             {
                 case "Name_desc":
@@ -60,25 +54,25 @@ namespace Cars.Controllers
             return RedirectToAction("Index", new { currentPage = 1, searchString });
         }
 
-        public async Task<IActionResult> Next ([Bind("SearchString")] string searchString, int currentPage)
+        public async Task<IActionResult> Next([Bind("SearchString")] string searchString, int currentPage)
         {
             var page = currentPage;
             var count = await _carService.GetVehicleMakesCount();
-            if ( (currentPage + 1 ) * _pageSize <= count)
+            if ((currentPage + 1) * _pageSize <= count)
             {
                 page += 1;
             }
             return RedirectToAction("Index", new { currentPage = page, searchString });
         }
 
-        public async Task<IActionResult> Previous(int currentPage)
+        public async Task<IActionResult> Previous([Bind("SearchString")] string searchString, int currentPage)
         {
             var page = currentPage;
             if (currentPage > 1)
             {
-                page--;
-                                }
-            return RedirectToAction("Index", new { currentPage = page });
+                await Task.Run(() => page--);
+            }
+            return RedirectToAction("Index", new { currentPage = page, searchString });
         }
         // GET: VehicleMakes/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -110,19 +104,19 @@ namespace Cars.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Abrv")] VehicleMake vehicleMake)
+        public async Task<IActionResult> Create([Bind("Id,Name,Abrv")] VehicleMakeDto vehicleMakeDto)
         {
             if (ModelState.IsValid)
             {
-                var numberOfSaves = await _carService.CreateVehicleMakeAsync(vehicleMake);
+                var numberOfSaves = await _carService.CreateVehicleMakeAsync(vehicleMakeDto);
                 if (numberOfSaves > 0)
                 {
                     return RedirectToAction(nameof(Index));
                 }
-                return View(vehicleMake);
+                return View(vehicleMakeDto);
 
             }
-            return View(vehicleMake);
+            return View(vehicleMakeDto);
         }
 
 
@@ -147,9 +141,9 @@ namespace Cars.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Abrv")] VehicleMake vehicleMake)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Abrv")] VehicleMakeDto vehicleMakeDto)
         {
-            if (id != vehicleMake.Id)
+            if (id != vehicleMakeDto.Id)
             {
                 return NotFound();
             }
@@ -158,11 +152,11 @@ namespace Cars.Controllers
             {
                 try
                 {
-                    var numberOfChanges = await _carService.UpdateVehicleMakeAsync(vehicleMake);
+                    var numberOfChanges = await _carService.UpdateVehicleMakeAsync(vehicleMakeDto);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!_carService.VehicleMakeExists(vehicleMake.Id))
+                    if (!_carService.VehicleMakeExists(vehicleMakeDto.Id))
                     {
                         return NotFound();
                     }
@@ -173,7 +167,7 @@ namespace Cars.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(vehicleMake);
+            return View(vehicleMakeDto);
         }
 
 

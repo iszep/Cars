@@ -1,4 +1,4 @@
 # CarsMakesAndModels
-## Program za unošenje modela i marki automobila
+## Application for vehicles 
 
-Prije pokretanja programa u PMC unijeti naredbu Update-Database za kreiranje baze.
+Before using application, first you need to update database in PMC.

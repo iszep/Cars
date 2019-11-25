@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Cars.Service.Models.VehicleModel>
+﻿@model IEnumerable<Cars.Service.Dtos.VehicleModelDto>
 
 @{
     ViewData["Title"] = "Index";
@@ -19,7 +19,7 @@
                 @Html.DisplayNameFor(model => model.Abrv)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.VehicleMake)
+                @Html.DisplayNameFor(model => model.MakeId)
             </th>
             <th></th>
         </tr>
@@ -34,7 +34,7 @@
                 @Html.DisplayFor(modelItem => item.Abrv)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.VehicleMake.Abrv)
+                @Html.DisplayFor(modelItem => item.MakeId)
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |

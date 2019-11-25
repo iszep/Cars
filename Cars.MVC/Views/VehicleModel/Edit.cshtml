@@ -1,4 +1,4 @@
-﻿@model Cars.Service.Models.VehicleModel
+﻿@model Cars.Service.Dtos.VehicleModelDto
 
 @{
     ViewData["Title"] = "Edit";
@@ -37,7 +37,7 @@
 </div>
 
 <div>
-    <a asp-controller="VehicleMake" asp-action="Index">  Back to List</a>
+    <a asp-controller="VehicleModel" asp-action="Index" asp-route-makeId="@Model.MakeId">  Back to List</a>
 </div>
 
 @section Scripts {

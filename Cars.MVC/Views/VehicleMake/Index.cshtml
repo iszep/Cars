@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Cars.Service.Models.VehicleMake>
+﻿@model IEnumerable<Cars.Service.Dtos.VehicleMakeDto>
 
 @{
     ViewData["Title"] = "Index";
@@ -6,18 +6,18 @@
 
 <h1>Index</h1>
 
-<p>
+<div>
     <a asp-action="Create">Create New</a>
     <form method="post">
-        <p>
+        <div>
             Find by name:
-            <input type="text" class="form-control" placeholder="Enter  make name" name="SearchString" maxlength="20" value="@ViewBag.SearchString"/>
+            <input type="text" style="width:200px;" class="form-control" placeholder="Car name" name="SearchString" maxlength="20" value="@ViewBag.SearchString"/>
             <button type="submit" asp-action="Search">Search</button>
-        </p>
+        </div>
     </form>
 
-</p>
-<table class="table">
+</div>
+<table class="table table-striped">
     <thead>
         <tr>
             <th>
@@ -56,7 +56,7 @@
     </tbody>
 </table>
 <form>
-    <a class="btn btn-dark float-left" asp-action="Previous" asp-route-currentPage="@ViewBag.CurrentPage">Previous</a>
+    <a class="btn btn-dark float-left" asp-action="Previous" asp-route-currentPage="@ViewBag.CurrentPage" asp-route-searchString="@ViewBag.SearchString">Previous</a>
     <a class="btn btn-dark float-right" asp-action="Next" asp-route-currentPage="@ViewBag.CurrentPage" asp-route-searchString="@ViewBag.SearchString">Next</a>
 
 </form>
