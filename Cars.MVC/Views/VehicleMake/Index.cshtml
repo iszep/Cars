@@ -1,4 +1,6 @@
-﻿@model IEnumerable<Cars.Service.Dtos.VehicleMakeDto>
+﻿@using ReflectionIT.Mvc.Paging
+@addTagHelper *, ReflectionIT.Mvc.Paging
+@model PagingList<Cars.Service.Dtos.VehicleMakeDto>
 
 @{
     ViewData["Title"] = "Index";
@@ -11,8 +13,8 @@
     <form method="post">
         <div>
             Find by name:
-            <input type="text" style="width:200px;" class="form-control" placeholder="Car name" name="SearchString" maxlength="20" value="@ViewBag.SearchString"/>
-            <button type="submit" asp-action="Search">Search</button>
+            <input type="text" style="width:200px;" class="form-control" placeholder="Car name" name="search" maxlength="20" value="@Model.RouteValue["search"]" />
+            <button type="submit">Search</button>
         </div>
     </form>
 
@@ -21,11 +23,11 @@
     <thead>
         <tr>
             <th>
-                @Html.ActionLink("Name", "Index", new { sortBy = ViewBag.NameSortParm })
+                @Html.SortableHeaderFor(model => model.Name, "Name")
             </th>
 
             <th>
-                @Html.ActionLink("Abrv", "Index", new { sortBy = ViewBag.AbrvSortParm })
+                @Html.SortableHeaderFor(model => model.Abrv, "Abrv")
             </th>
             <th></th>
         </tr>
@@ -46,7 +48,7 @@
                     <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
                     <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
                     <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-                    <a asp-controller="VehicleModel" asp-action="Index" asp-route-makeId="@item.Id" asp-route-searhString="">Models</a>
+                    <a asp-controller="VehicleModel" asp-action="Index" asp-route-makeId="@item.Id" asp-route-search="">Models</a>
 
 
 
@@ -55,8 +57,6 @@
         }
     </tbody>
 </table>
-<form>
-    <a class="btn btn-dark float-left" asp-action="Previous" asp-route-currentPage="@ViewBag.CurrentPage" asp-route-searchString="@ViewBag.SearchString">Previous</a>
-    <a class="btn btn-dark float-right" asp-action="Next" asp-route-currentPage="@ViewBag.CurrentPage" asp-route-searchString="@ViewBag.SearchString">Next</a>
-
-</form>
+<nav aria-label="Car makes navigation">
+    <vc:pager paging-list="@Model" />
+</nav>

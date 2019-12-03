@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Cars.Service.Data;
 using Cars.Service.Dtos;
 using Cars.Service.Interfaces;
 using Cars.Service.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using ReflectionIT.Mvc.Paging;
 
 namespace Cars.Service.Services
 {
@@ -16,44 +18,36 @@ namespace Cars.Service.Services
     {
         ApplicationDbContext _db;
         IMapper _mapper;
-        public CarService(ApplicationDbContext db, IMapper mapper)
+        IConfigurationProvider _cfg;
+        public CarService(ApplicationDbContext db, IMapper mapper, IConfigurationProvider cfg)
         {
             _db = db;
             _mapper = mapper;
+            _cfg = cfg;
         }
 
-        public Task<int> GetVehicleMakesCount()
+        public async Task<IPagingList<VehicleMakeDto>> GetVehicleMakesPagedAsync(VehicleMakeDtoQuery queryParams)
         {
-            return _db.VehicleMakes.CountAsync();
-        }
-
-        //public async Task<IEnumerable<VehicleMake>> GetVehicleMakeAsync()
-        //{
-        //    var vehicleMakes = await _db.VehicleMakes.ToListAsync();
-        //    return vehicleMakes;
-        //}
-
-      
-
-        public async Task<IEnumerable<VehicleMakeDto>> GetVehicleMakesPagedAsync(int page, int pageSize, string searchString)
-        {
-            var query = _db.VehicleMakes.Where(x => true);
-            if (!string.IsNullOrEmpty(searchString))
+            var query = _db.VehicleMakes.ProjectTo<VehicleMakeDto>(_cfg);
+            if (!string.IsNullOrEmpty(queryParams.Search))
             {
-                query = query.Where(x => x.Name.Contains(searchString));
+                query = query.Where(x => x.Name.Contains(queryParams.Search));
             }
-            var vehicleMakes = await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();           
-
-            var vehicleMakeDtos = _mapper.Map<IEnumerable<VehicleMake>, IEnumerable<VehicleMakeDto>>(vehicleMakes);
-            return vehicleMakeDtos;
+            var model = await PagingList.CreateAsync(query, queryParams.PageSize, queryParams.PageIndex, queryParams.Sort, queryParams.Sort);
+            return model;
         }
 
         public async Task<VehicleMakeDto> GetVehicleMakeAsync(int? id)
         {
             var vehicleMake = await _db.VehicleMakes
                .FirstOrDefaultAsync(m => m.Id == id);
+            if (vehicleMake == null)
+            {
+                throw new Exception("Vehicle Make not found");
+            }
 
             var vehicleMakeDto = _mapper.Map<VehicleMake, VehicleMakeDto>(vehicleMake);
+
             return vehicleMakeDto;
         }
 
@@ -66,14 +60,8 @@ namespace Cars.Service.Services
             return numberOfCreated;
             
         }
+           
 
-        public async Task<VehicleMakeDto> FindVehicleMakeAsync(int? id)
-        {
-
-            var vehicleMake = await _db.VehicleMakes.FindAsync(id);
-            var vehicleMakeDto = _mapper.Map<VehicleMake, VehicleMakeDto>(vehicleMake);
-            return vehicleMakeDto;
-        }
         public async Task<int> UpdateVehicleMakeAsync(VehicleMakeDto vehicleMakeDto)
         {
             var vehicleMake = _mapper.Map<VehicleMakeDto, VehicleMake>(vehicleMakeDto);
@@ -90,7 +78,12 @@ namespace Cars.Service.Services
 
         public async Task<int> DeleteVehicleMakeAsync(int? id)
         {
-            var vehicleMake = await _db.VehicleMakes.FindAsync(id);
+            var vehicleMake = await _db.VehicleMakes.FirstOrDefaultAsync(x => x.Id == id);
+            if (vehicleMake == null)
+            {
+                throw new Exception("Not found");
+            }
+
             _db.VehicleMakes.Remove(vehicleMake);
             var numberOfDeleted = await _db.SaveChangesAsync();
             return numberOfDeleted;
@@ -100,6 +93,10 @@ namespace Cars.Service.Services
         {
             
             var vehicleModel = await _db.VehicleModels.Where(x => x.MakeId == makeId).ToListAsync();
+            if (vehicleModel == null)
+            {
+                throw new Exception("Not found");
+            }
             var vehicleModelDto = _mapper.Map<IEnumerable<VehicleModel>, IEnumerable<VehicleModelDto>>(vehicleModel);
 
             return vehicleModelDto;
@@ -111,6 +108,10 @@ namespace Cars.Service.Services
             var vehicleModel = await _db.VehicleModels
                .Include(v => v.VehicleMake)
                .FirstOrDefaultAsync(m => m.Id == id);
+            if (vehicleModel == null)
+            {
+                throw new Exception("Not found");
+            }
             var vehicleModelDto = _mapper.Map<VehicleModel, VehicleModelDto>(vehicleModel);
             return vehicleModelDto;
         }
@@ -123,12 +124,12 @@ namespace Cars.Service.Services
             return numberOfCreated;
         }
 
-        public async Task<VehicleModelDto> FindVehicleModelAsync(int? id)
-        {
-            var vehicleModel = await _db.VehicleModels.FindAsync(id);
-            var vehicleModelDto = _mapper.Map<VehicleModel, VehicleModelDto>(vehicleModel);
-            return vehicleModelDto;
-        }
+        //public async Task<VehicleModelDto> FindVehicleModelAsync(int? id)
+        //{
+        //    var vehicleModel = await _db.VehicleModels.FindAsync(id);
+        //    var vehicleModelDto = _mapper.Map<VehicleModel, VehicleModelDto>(vehicleModel);
+        //    return vehicleModelDto;
+        //}
 
         public async Task<int> UpdateVehicleModelAsync(VehicleModelDto vehicleModelDto)
         {

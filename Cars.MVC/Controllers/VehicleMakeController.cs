@@ -10,6 +10,7 @@ using Cars.Service.Models;
 using Cars.Service.Services;
 using Cars.Service.Interfaces;
 using Cars.Service.Dtos;
+using Microsoft.AspNetCore.Routing;
 
 namespace Cars.Controllers
 {
@@ -25,55 +26,17 @@ namespace Cars.Controllers
             _carService = carService;
         }
 
-        public async Task<IActionResult> Index(string sortBy, string searchString, int currentPage = 1)
+        public async Task<IActionResult> Index(int pageindex = 1, string sort = "Name", string search = "")
         {
-            ViewBag.NameSortParm = String.IsNullOrEmpty(sortBy) ? "Name_desc" : "";
-            ViewBag.AbrvSortParm = String.IsNullOrEmpty(sortBy) ? "Abrv_desc" : "";
-            ViewBag.CurrentPage = currentPage;
-            ViewBag.SearchString = searchString;
-            var vehicleMakes = await _carService.GetVehicleMakesPagedAsync(currentPage, _pageSize, searchString);
-
-            switch (sortBy)
+            var queryParams = new VehicleMakeDtoQuery { PageIndex = pageindex, Sort = sort, Search = search, PageSize = _pageSize };
+            var model = await _carService.GetVehicleMakesPagedAsync(queryParams);
+            model.RouteValue = new RouteValueDictionary
             {
-                case "Name_desc":
-                    vehicleMakes = vehicleMakes.OrderByDescending(s => s.Name);
-                    break;
-                case "Abrv_desc":
-                    vehicleMakes = vehicleMakes.OrderByDescending(s => s.Abrv);
-                    break;
-                default:
-                    vehicleMakes = vehicleMakes.OrderBy(s => s.Name);
-                    break;
-            }
-            return View(vehicleMakes);
+                { "search", search }
+            };
+            return View(model);
         }
-
-        [HttpPost]
-        public IActionResult Search([Bind("SearchString")] string searchString)
-        {
-            return RedirectToAction("Index", new { currentPage = 1, searchString });
-        }
-
-        public async Task<IActionResult> Next([Bind("SearchString")] string searchString, int currentPage)
-        {
-            var page = currentPage;
-            var count = await _carService.GetVehicleMakesCount();
-            if ((currentPage + 1) * _pageSize <= count)
-            {
-                page += 1;
-            }
-            return RedirectToAction("Index", new { currentPage = page, searchString });
-        }
-
-        public async Task<IActionResult> Previous([Bind("SearchString")] string searchString, int currentPage)
-        {
-            var page = currentPage;
-            if (currentPage > 1)
-            {
-                await Task.Run(() => page--);
-            }
-            return RedirectToAction("Index", new { currentPage = page, searchString });
-        }
+    
         // GET: VehicleMakes/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -82,13 +45,16 @@ namespace Cars.Controllers
                 return NotFound();
             }
 
-            var vehicleMake = await _carService.GetVehicleMakeAsync(id);
-            if (vehicleMake == null)
+            try
             {
-                return NotFound();
-            }
+                var vehicleMake = await _carService.GetVehicleMakeAsync(id);
+                return View(vehicleMake);
 
-            return View(vehicleMake);
+            }
+            catch (Exception)
+            {
+                return RedirectToAction("Error","Home");
+            }        
         }
 
 
@@ -108,12 +74,16 @@ namespace Cars.Controllers
         {
             if (ModelState.IsValid)
             {
-                var numberOfSaves = await _carService.CreateVehicleMakeAsync(vehicleMakeDto);
-                if (numberOfSaves > 0)
+                try
                 {
+                    var numberOfSaves = await _carService.CreateVehicleMakeAsync(vehicleMakeDto);
                     return RedirectToAction(nameof(Index));
                 }
-                return View(vehicleMakeDto);
+                catch(Exception)
+                {
+                    return RedirectToAction("Error", "Home");
+                }
+                
 
             }
             return View(vehicleMakeDto);
@@ -128,12 +98,16 @@ namespace Cars.Controllers
                 return NotFound();
             }
 
-            var vehicleMake = await _carService.FindVehicleMakeAsync(id);
-            if (vehicleMake == null)
+            try
             {
-                return NotFound();
+                var vehicleMake = await _carService.GetVehicleMakeAsync(id);
+                return View(vehicleMake);
             }
-            return View(vehicleMake);
+            catch (Exception)
+            {
+                return RedirectToAction("Error", "Home");
+            }
+
         }
 
         // POST: VehicleMakes/Edit/5
@@ -154,16 +128,9 @@ namespace Cars.Controllers
                 {
                     var numberOfChanges = await _carService.UpdateVehicleMakeAsync(vehicleMakeDto);
                 }
-                catch (DbUpdateConcurrencyException)
+                catch (Exception)
                 {
-                    if (!_carService.VehicleMakeExists(vehicleMakeDto.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    return RedirectToAction("Error", "Home");                
                 }
                 return RedirectToAction(nameof(Index));
             }
@@ -178,15 +145,18 @@ namespace Cars.Controllers
             {
                 return NotFound();
             }
-
-            var vehicleMake = await _carService.FindVehicleMakeAsync(id);
-
-            if (vehicleMake == null)
+            try
             {
-                return NotFound();
+                var vehicleMake = await _carService.GetVehicleMakeAsync(id);
+                return View(vehicleMake);
             }
 
-            return View(vehicleMake);
+            catch (Exception)
+            {
+                return RedirectToAction("Error", "Home");
+
+            }          
+
         }
 
         // POST: VehicleMakes/Delete/5
@@ -195,9 +165,16 @@ namespace Cars.Controllers
         //[HttpDelete]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+            try { 
             var vehicleMake = await _carService.DeleteVehicleMakeAsync(id);
+                return RedirectToAction(nameof(Index));
+            }
+            catch(Exception)
+            {
+                return RedirectToAction("Error", "Home");
+            }
 
-            return RedirectToAction(nameof(Index));
+            
         }
 
 

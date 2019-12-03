@@ -15,6 +15,7 @@ using Microsoft.Extensions.Hosting;
 using Cars.Service.Services;
 using Cars.Service.Interfaces;
 using AutoMapper;
+using ReflectionIT.Mvc.Paging;
 
 namespace Cars
 {
@@ -34,12 +35,17 @@ namespace Cars
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection"), b => b.MigrationsAssembly("Cars.MVC")));
             services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
             services.AddControllersWithViews();
             services.AddRazorPages();
             services.AddTransient<ICarService,CarService>();
+            services.AddTransient<IAuthService, AuthService>();
             services.AddAutoMapper(typeof(Startup));
-            //services.AddTransient<ICarService, FakeCarService>();
+             services.AddPaging(options => {
+                options.ViewName = "Bootstrap4";
+                options.PageParameterName = "pageindex";
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

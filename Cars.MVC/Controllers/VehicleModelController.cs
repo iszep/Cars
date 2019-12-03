@@ -41,14 +41,17 @@ namespace Cars.Controllers
             {
                 return NotFound();
             }
-
-            var vehicleModel = await _carService.GetVehicleModelAsync(id);
-            if (vehicleModel == null)
+            try
             {
-                return NotFound();
+                var vehicleModel = await _carService.GetVehicleModelAsync(id);
+                return View(vehicleModel);
             }
-
-            return View(vehicleModel);
+            catch(Exception)
+            {
+                return RedirectToAction("Error", "Home");
+            }
+                     
+          
         }
 
         // GET: VehicleModels/Create
@@ -68,8 +71,15 @@ namespace Cars.Controllers
         {
             if (ModelState.IsValid)
             {
+                try
+                { 
                 var numberOfSaves = await _carService.CreateVehicleModelAsync(vehicleModelDto);                
                 return RedirectToAction(nameof(Index), new { makeId = vehicleModelDto.MakeId });
+                }
+                catch (Exception)
+                {
+                    return RedirectToAction("Error", "Home");
+                }
             }
             //ViewData["MakeId"] = new SelectList(_context.VehicleMakes, "Id", "Abrv", vehicleModel.MakeId);
             return View(vehicleModelDto);
@@ -84,19 +94,22 @@ namespace Cars.Controllers
                 return NotFound();
             }
 
+            try
+            { 
+           
+            var vehicleModel = await _carService.GetVehicleModelAsync(id);
+            var vehicleMake = await _carService.GetVehicleMakeAsync(vehicleModel.MakeId);
+            ViewBag.VehicleMakeName = vehicleMake.Name;
+                return View(vehicleModel);
+
+            }
+            catch(Exception)
+            {
+                return RedirectToAction("Error", "Home");
+            }
+                     
             
            
-            var vehicleModel = await _carService.FindVehicleModelAsync(id);
-            var vehicleMake = await _carService.FindVehicleMakeAsync(vehicleModel.MakeId);
-            ViewBag.VehicleMakeName = vehicleMake.Name;
-
-
-            if (vehicleModel == null)
-            {
-                return NotFound();
-            }            
-            
-            return View(vehicleModel);
         }
 
         // POST: VehicleModels/Edit/5
@@ -117,25 +130,15 @@ namespace Cars.Controllers
                 try
                 {
                     
-                    await _carService.UpdateVehicleModelAsync(vehicleModelDto);
+                    await _carService.UpdateVehicleModelAsync(vehicleModelDto);                   
                     
                 }
-                catch (DbUpdateConcurrencyException)
+                catch (Exception)
                 {
-                    if (!VehicleModelExists(vehicleModelDto.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    return RedirectToAction("Error", "Home");
                 }
                 return RedirectToAction(nameof(Index), new { makeId = vehicleModelDto.MakeId });
-
             }
-            //var vehicleMake = await _carService.GetVehicleMakeAsync();
-            
             return View(vehicleModelDto);
             
         }
@@ -147,15 +150,17 @@ namespace Cars.Controllers
             {
                 return NotFound();
             }
-
-            var vehicleModel = await _carService.FindVehicleModelAsync(id);                
-                
-            if (vehicleModel == null)
+            try
             {
-                return NotFound();
+                var vehicleModel = await _carService.GetVehicleModelAsync(id);
+                return View(vehicleModel);
             }
 
-            return View(vehicleModel);
+                   catch(Exception)
+            {
+                return RedirectToAction("Error", "Home");
+            }               
+           
         }
 
         // POST: VehicleModels/Delete/5
@@ -164,11 +169,18 @@ namespace Cars.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id, [Bind("Id,Name,Abrv,MakeId")] VehicleModelDto vehicleModelDto)
         {
             
-            
-                 await _carService.DeleteVehicleModelAsync(id);
+            try
+            {
+                await _carService.DeleteVehicleModelAsync(id);
 
-               return RedirectToAction(nameof(Index), new { makeId = vehicleModelDto.MakeId});
+                return RedirectToAction(nameof(Index), new { makeId = vehicleModelDto.MakeId });
 
+            }
+                 
+            catch (Exception)
+            {
+                return RedirectToAction("Error", "Home");
+            }
         }
 
         private bool VehicleModelExists(int id)
