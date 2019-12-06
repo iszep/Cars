@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
+using System.Threading.Tasks;
 
-namespace Cars.Service.Dtos
+namespace Cars.MVC.Models
 {
-    public class VehicleMakeDto
+    public class IndexVehicleMake
     {
         public int Id { get; set; }
         public string Name { get; set; }

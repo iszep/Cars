@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Cars.Service.Models;
 using Cars.Service.Dtos;
+using Cars.MVC.Models;
 
 namespace Cars.MVC.Profiles
 {
@@ -14,6 +15,12 @@ namespace Cars.MVC.Profiles
         {
             CreateMap<VehicleModel, VehicleModelDto>();
             CreateMap<VehicleModelDto, VehicleModel>();
+
+            CreateMap<VehicleModel, CreateVehicleModel>();
+            CreateMap<CreateVehicleModel, VehicleMake>();
+
+            CreateMap<VehicleModel, IndexVehicleModel>();
+            CreateMap<IndexVehicleModel, VehicleMake>();
         }
     }
 }

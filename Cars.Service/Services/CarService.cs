@@ -26,35 +26,31 @@ namespace Cars.Service.Services
             _cfg = cfg;
         }
 
-        public async Task<IPagingList<VehicleMakeDto>> GetVehicleMakesPagedAsync(VehicleMakeDtoQuery queryParams)
+        public IQueryable<VehicleMake> GetVehicleMakesPaged(IVehicleMakeQuery queryParams)
         {
-            var query = _db.VehicleMakes.ProjectTo<VehicleMakeDto>(_cfg);
+            var query = _db.VehicleMakes.AsQueryable();
             if (!string.IsNullOrEmpty(queryParams.Search))
             {
                 query = query.Where(x => x.Name.Contains(queryParams.Search));
             }
-            var model = await PagingList.CreateAsync(query, queryParams.PageSize, queryParams.PageIndex, queryParams.Sort, queryParams.Sort);
-            return model;
+            return query;
         }
 
-        public async Task<VehicleMakeDto> GetVehicleMakeAsync(int? id)
+        public async Task<VehicleMake> GetVehicleMakeAsync(int? id)
         {
             var vehicleMake = await _db.VehicleMakes
                .FirstOrDefaultAsync(m => m.Id == id);
             if (vehicleMake == null)
             {
                 throw new Exception("Vehicle Make not found");
-            }
+            }           
 
-            var vehicleMakeDto = _mapper.Map<VehicleMake, VehicleMakeDto>(vehicleMake);
-
-            return vehicleMakeDto;
+            return vehicleMake;
         }
 
-        public async Task<int> CreateVehicleMakeAsync (VehicleMakeDto vehicleMakeDto)
+        public async Task<int> CreateVehicleMakeAsync (VehicleMake vehicleMake)
         {
 
-            var vehicleMake = _mapper.Map<VehicleMakeDto, VehicleMake>(vehicleMakeDto);
             _db.Add(vehicleMake);
             var numberOfCreated = await _db.SaveChangesAsync();            
             return numberOfCreated;
@@ -62,9 +58,9 @@ namespace Cars.Service.Services
         }
            
 
-        public async Task<int> UpdateVehicleMakeAsync(VehicleMakeDto vehicleMakeDto)
+        public async Task<int> UpdateVehicleMakeAsync(VehicleMake vehicleMake)
         {
-            var vehicleMake = _mapper.Map<VehicleMakeDto, VehicleMake>(vehicleMakeDto);
+            
             _db.Update(vehicleMake);
             var numberOfChanges = await _db.SaveChangesAsync();
             
@@ -89,7 +85,7 @@ namespace Cars.Service.Services
             return numberOfDeleted;
             
         }
-        public async Task<IEnumerable<VehicleModelDto>> GetVehicleModelAsync(int makeId)
+        public async Task<IEnumerable<VehicleModel>> GetVehicleModelAsync(int makeId)
         {
             
             var vehicleModel = await _db.VehicleModels.Where(x => x.MakeId == makeId).ToListAsync();
@@ -97,9 +93,9 @@ namespace Cars.Service.Services
             {
                 throw new Exception("Not found");
             }
-            var vehicleModelDto = _mapper.Map<IEnumerable<VehicleModel>, IEnumerable<VehicleModelDto>>(vehicleModel);
+            //var vehicleModelDto = _mapper.Map<IEnumerable<VehicleModel>, IEnumerable<VehicleModelDto>>(vehicleModel);
 
-            return vehicleModelDto;
+            return vehicleModel;
 
         }
 
@@ -116,20 +112,14 @@ namespace Cars.Service.Services
             return vehicleModelDto;
         }
 
-        public async Task<int> CreateVehicleModelAsync(VehicleModelDto vehicleModelDto)
+        public async Task<int> CreateVehicleModelAsync(VehicleModel vehicleModel)
         {
-            var vehicleModel = _mapper.Map<VehicleModelDto, VehicleModel>(vehicleModelDto);
+            
             _db.Add(vehicleModel);
             var numberOfCreated = await _db.SaveChangesAsync();            
             return numberOfCreated;
         }
-
-        //public async Task<VehicleModelDto> FindVehicleModelAsync(int? id)
-        //{
-        //    var vehicleModel = await _db.VehicleModels.FindAsync(id);
-        //    var vehicleModelDto = _mapper.Map<VehicleModel, VehicleModelDto>(vehicleModel);
-        //    return vehicleModelDto;
-        //}
+      
 
         public async Task<int> UpdateVehicleModelAsync(VehicleModelDto vehicleModelDto)
         {

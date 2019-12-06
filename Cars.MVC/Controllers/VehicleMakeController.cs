@@ -11,6 +11,10 @@ using Cars.Service.Services;
 using Cars.Service.Interfaces;
 using Cars.Service.Dtos;
 using Microsoft.AspNetCore.Routing;
+using Cars.MVC.Models;
+using AutoMapper;
+using ReflectionIT.Mvc.Paging;
+using AutoMapper.QueryableExtensions;
 
 namespace Cars.Controllers
 {
@@ -18,23 +22,31 @@ namespace Cars.Controllers
     {
 
         private readonly ICarService _carService;
+        private readonly IMapper _mapper;
         private readonly int _pageSize = 5;
+        IConfigurationProvider _cfg;
 
-        public VehicleMakeController(ICarService carService)
+        public VehicleMakeController(ICarService carService, IMapper mapper, IConfigurationProvider cfg)
         {
 
             _carService = carService;
+            _mapper = mapper;
+            _cfg = cfg;
         }
 
         public async Task<IActionResult> Index(int pageindex = 1, string sort = "Name", string search = "")
         {
-            var queryParams = new VehicleMakeDtoQuery { PageIndex = pageindex, Sort = sort, Search = search, PageSize = _pageSize };
-            var model = await _carService.GetVehicleMakesPagedAsync(queryParams);
-            model.RouteValue = new RouteValueDictionary
+            var queryParams = new VehicleMakeQuery { PageIndex = pageindex, Sort = sort, Search = search, PageSize = _pageSize };
+
+            var query = _carService.GetVehicleMakesPaged(queryParams).ProjectTo<IndexVehicleMake>(_cfg);
+            var page = await PagingList.CreateAsync(query, queryParams.PageSize, queryParams.PageIndex, queryParams.Sort, queryParams.Sort);
+
+            page.RouteValue = new RouteValueDictionary
             {
                 { "search", search }
             };
-            return View(model);
+
+            return View(page);
         }
     
         // GET: VehicleMakes/Details/5
@@ -46,9 +58,12 @@ namespace Cars.Controllers
             }
 
             try
+
             {
+                
                 var vehicleMake = await _carService.GetVehicleMakeAsync(id);
-                return View(vehicleMake);
+                var detailsVehicleMake = _mapper.Map<VehicleMake, DetailsVehicleMake>(vehicleMake);
+                return View(detailsVehicleMake);
 
             }
             catch (Exception)
@@ -70,13 +85,14 @@ namespace Cars.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Abrv")] VehicleMakeDto vehicleMakeDto)
+        public async Task<IActionResult> Create([Bind("Name,Abrv")] CreateVehicleMake createVehicleMake)
         {
             if (ModelState.IsValid)
             {
                 try
                 {
-                    var numberOfSaves = await _carService.CreateVehicleMakeAsync(vehicleMakeDto);
+                    var vehicleMake = _mapper.Map<CreateVehicleMake, VehicleMake>(createVehicleMake);
+                    var numberOfSaves = await _carService.CreateVehicleMakeAsync(vehicleMake);
                     return RedirectToAction(nameof(Index));
                 }
                 catch(Exception)
@@ -86,7 +102,7 @@ namespace Cars.Controllers
                 
 
             }
-            return View(vehicleMakeDto);
+            return View(createVehicleMake);
         }
 
 
@@ -101,7 +117,8 @@ namespace Cars.Controllers
             try
             {
                 var vehicleMake = await _carService.GetVehicleMakeAsync(id);
-                return View(vehicleMake);
+                var editVehicleMake = _mapper.Map<VehicleMake, EditVehicleMake>(vehicleMake);
+                return View(editVehicleMake);
             }
             catch (Exception)
             {
@@ -115,9 +132,9 @@ namespace Cars.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Abrv")] VehicleMakeDto vehicleMakeDto)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Abrv")] EditVehicleMake editVehicleMake)
         {
-            if (id != vehicleMakeDto.Id)
+            if (id != editVehicleMake.Id)
             {
                 return NotFound();
             }
@@ -126,7 +143,8 @@ namespace Cars.Controllers
             {
                 try
                 {
-                    var numberOfChanges = await _carService.UpdateVehicleMakeAsync(vehicleMakeDto);
+                    var vehicleMake = _mapper.Map<EditVehicleMake, VehicleMake>(editVehicleMake);
+                    var numberOfChanges = await _carService.UpdateVehicleMakeAsync(vehicleMake);
                 }
                 catch (Exception)
                 {
@@ -134,7 +152,7 @@ namespace Cars.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(vehicleMakeDto);
+            return View(editVehicleMake);
         }
 
 
@@ -148,7 +166,8 @@ namespace Cars.Controllers
             try
             {
                 var vehicleMake = await _carService.GetVehicleMakeAsync(id);
-                return View(vehicleMake);
+                var deleteVehicleMake = _mapper.Map<VehicleMake, DeleteVehicleMake>(vehicleMake);
+                return View(deleteVehicleMake);
             }
 
             catch (Exception)

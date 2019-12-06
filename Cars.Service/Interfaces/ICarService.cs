@@ -11,19 +11,18 @@ namespace Cars.Service.Interfaces
     public interface ICarService
     {
         // Car Makes
-        Task<IPagingList<VehicleMakeDto>> GetVehicleMakesPagedAsync(VehicleMakeDtoQuery queryParams);
-        Task<VehicleMakeDto> GetVehicleMakeAsync(int? id);
-        Task<int> CreateVehicleMakeAsync(VehicleMakeDto vehicleMakeDto);
-        //Task<VehicleMakeDto> FindVehicleMakeAsync(int? id);
-        Task<int> UpdateVehicleMakeAsync(VehicleMakeDto vehicleMakeDto);
+        IQueryable<VehicleMake> GetVehicleMakesPaged(IVehicleMakeQuery queryParams);
+        Task<VehicleMake> GetVehicleMakeAsync(int? id);
+        Task<int> CreateVehicleMakeAsync(VehicleMake vehicleMake);
+        Task<int> UpdateVehicleMakeAsync(VehicleMake vehicleMake);
         bool VehicleMakeExists(int id);
         Task<int> DeleteVehicleMakeAsync(int? id);
 
         // Car Models
-        Task<IEnumerable<VehicleModelDto>> GetVehicleModelAsync(int makeId);
+        Task<IEnumerable<VehicleModel>> GetVehicleModelAsync(int makeId);
         Task<VehicleModelDto> GetVehicleModelAsync(int? id);
-        Task<int> CreateVehicleModelAsync(VehicleModelDto vehicleModelDto);
-        //Task<VehicleModelDto> FindVehicleModelAsync(int? id);
+        Task<int> CreateVehicleModelAsync(VehicleModel vehicleModel);
+       
         Task<int> UpdateVehicleModelAsync(VehicleModelDto vehicleModelDto);
         Task<int> DeleteVehicleModelAsync(int? id);
         bool VehicleModelExists(int? id);

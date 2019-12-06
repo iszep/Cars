@@ -10,6 +10,7 @@ using Cars.Service.Models;
 using Cars.Service.Interfaces;
 using AutoMapper;
 using Cars.Service.Dtos;
+using Cars.MVC.Models;
 
 namespace Cars.Controllers
 {
@@ -29,8 +30,9 @@ namespace Cars.Controllers
 
             ViewBag.MakeId = makeId;
             var vehicleModel = await _carService.GetVehicleModelAsync(makeId);
+            var indexVehicleModel = _mapper.Map<IEnumerable<VehicleModel>, IEnumerable<IndexVehicleModel>>(vehicleModel);
 
-            return View(vehicleModel);
+            return View(indexVehicleModel);
             
         }
 
@@ -58,8 +60,9 @@ namespace Cars.Controllers
         public IActionResult Create(int makeId)
         {
             
-            var vehicleModel = new VehicleModelDto { MakeId = makeId };
-            return View(vehicleModel);
+            var vehicleModel = new VehicleModel { MakeId = makeId };
+            var createVehicleModel = _mapper.Map<VehicleModel, CreateVehicleModel>(vehicleModel);
+            return View(createVehicleModel);
         }
 
         // POST: VehicleModels/Create
@@ -67,22 +70,23 @@ namespace Cars.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Abrv,MakeId")] VehicleModelDto vehicleModelDto)
+        public async Task<IActionResult> Create([Bind("Name,Abrv,MakeId")] CreateVehicleModel createVehicleModel)
         {
             if (ModelState.IsValid)
             {
                 try
-                { 
-                var numberOfSaves = await _carService.CreateVehicleModelAsync(vehicleModelDto);                
-                return RedirectToAction(nameof(Index), new { makeId = vehicleModelDto.MakeId });
+                {
+                    var vehicleModel = _mapper.Map<CreateVehicleModel, VehicleModel>(createVehicleModel);
+                    var numberOfSaves = await _carService.CreateVehicleModelAsync(vehicleModel);                
+                return RedirectToAction(nameof(Index), new { makeId = vehicleModel.MakeId });
                 }
                 catch (Exception)
                 {
                     return RedirectToAction("Error", "Home");
                 }
             }
-            //ViewData["MakeId"] = new SelectList(_context.VehicleMakes, "Id", "Abrv", vehicleModel.MakeId);
-            return View(vehicleModelDto);
+           
+            return View(createVehicleModel);
         }
 
         // GET: VehicleModels/Edit/5
