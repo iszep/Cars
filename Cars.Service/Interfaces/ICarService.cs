@@ -20,10 +20,10 @@ namespace Cars.Service.Interfaces
 
         // Car Models
         Task<IEnumerable<VehicleModel>> GetVehicleModelAsync(int makeId);
-        Task<VehicleModelDto> GetVehicleModelAsync(int? id);
+        Task<VehicleModel> GetVehicleModelAsync(int? id);
         Task<int> CreateVehicleModelAsync(VehicleModel vehicleModel);
        
-        Task<int> UpdateVehicleModelAsync(VehicleModelDto vehicleModelDto);
+        Task<int> UpdateVehicleModelAsync(VehicleModel vehicleModel);
         Task<int> DeleteVehicleModelAsync(int? id);
         bool VehicleModelExists(int? id);
 

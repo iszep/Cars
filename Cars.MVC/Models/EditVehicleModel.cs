@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using Cars.Service.Models;
+using System.Linq;
+using System.Threading.Tasks;
 
-namespace Cars.Service.Dtos
+namespace Cars.MVC.Models
 {
-   public class VehicleModelDto
+    public class EditVehicleModel
     {
         public int Id { get; set; }
         public string Name { get; set; }
         public string Abrv { get; set; }
         public int MakeId { get; set; }
-        
     }
 }

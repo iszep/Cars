@@ -93,13 +93,12 @@ namespace Cars.Service.Services
             {
                 throw new Exception("Not found");
             }
-            //var vehicleModelDto = _mapper.Map<IEnumerable<VehicleModel>, IEnumerable<VehicleModelDto>>(vehicleModel);
-
+           
             return vehicleModel;
 
         }
 
-        public async Task<VehicleModelDto> GetVehicleModelAsync(int? id)
+        public async Task<VehicleModel> GetVehicleModelAsync(int? id)
         {
             var vehicleModel = await _db.VehicleModels
                .Include(v => v.VehicleMake)
@@ -108,8 +107,8 @@ namespace Cars.Service.Services
             {
                 throw new Exception("Not found");
             }
-            var vehicleModelDto = _mapper.Map<VehicleModel, VehicleModelDto>(vehicleModel);
-            return vehicleModelDto;
+            
+            return vehicleModel;
         }
 
         public async Task<int> CreateVehicleModelAsync(VehicleModel vehicleModel)
@@ -121,9 +120,9 @@ namespace Cars.Service.Services
         }
       
 
-        public async Task<int> UpdateVehicleModelAsync(VehicleModelDto vehicleModelDto)
+        public async Task<int> UpdateVehicleModelAsync(VehicleModel vehicleModel)
         {
-            var vehicleModel = _mapper.Map<VehicleModelDto, VehicleModel>(vehicleModelDto);
+            
             _db.Update(vehicleModel);
            var numberOfChanges = await _db.SaveChangesAsync();
             return numberOfChanges;
@@ -136,13 +135,7 @@ namespace Cars.Service.Services
             var numberOfDeleted = await _db.SaveChangesAsync();
             return numberOfDeleted;
         }
-
-        public async Task<IEnumerable<VehicleModelDto>> GetVehicleModelsAsync(int makeId)
-        {
-            var vehicleModels = await _db.VehicleModels.Where(x => x.MakeId == makeId).Include(v => v.VehicleMake).ToListAsync();
-            var vehicleModelDto = _mapper.Map<IEnumerable<VehicleModel>, IEnumerable<VehicleModelDto>>(vehicleModels);
-            return vehicleModelDto;
-        }
+ 
 
         public bool VehicleModelExists(int? id)
         {

@@ -13,14 +13,23 @@ namespace Cars.MVC.Profiles
     {
         public CarVehicleModelProfile()
         {
-            CreateMap<VehicleModel, VehicleModelDto>();
-            CreateMap<VehicleModelDto, VehicleModel>();
-
+            
             CreateMap<VehicleModel, CreateVehicleModel>();
-            CreateMap<CreateVehicleModel, VehicleMake>();
+            CreateMap<CreateVehicleModel, VehicleModel>();
 
             CreateMap<VehicleModel, IndexVehicleModel>();
-            CreateMap<IndexVehicleModel, VehicleMake>();
+            CreateMap<IndexVehicleModel, VehicleModel>();
+
+            CreateMap<VehicleModel, DetailsVehicleModel>();
+            CreateMap<DetailsVehicleModel, VehicleModel>();
+
+            CreateMap<VehicleModel, EditVehicleModel>();
+            CreateMap<EditVehicleModel, VehicleModel>();
+
+            CreateMap<VehicleModel, DeleteVehicleModel>();
+            CreateMap<DeleteVehicleModel, VehicleModel>();
+
+
         }
     }
 }

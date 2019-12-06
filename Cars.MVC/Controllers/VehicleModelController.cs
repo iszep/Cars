@@ -46,7 +46,8 @@ namespace Cars.Controllers
             try
             {
                 var vehicleModel = await _carService.GetVehicleModelAsync(id);
-                return View(vehicleModel);
+                var detailsVehicleModel = _mapper.Map<VehicleModel, DetailsVehicleModel>(vehicleModel);
+                return View(detailsVehicleModel);
             }
             catch(Exception)
             {
@@ -102,9 +103,10 @@ namespace Cars.Controllers
             { 
            
             var vehicleModel = await _carService.GetVehicleModelAsync(id);
+            var editVehicleModel = _mapper.Map<VehicleModel, EditVehicleModel>(vehicleModel);
             var vehicleMake = await _carService.GetVehicleMakeAsync(vehicleModel.MakeId);
             ViewBag.VehicleMakeName = vehicleMake.Name;
-                return View(vehicleModel);
+                return View(editVehicleModel);
 
             }
             catch(Exception)
@@ -121,10 +123,10 @@ namespace Cars.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Abrv,MakeId")] VehicleModelDto vehicleModelDto)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Abrv,MakeId")] EditVehicleModel editVehicleModel)
         {
             
-            if (id != vehicleModelDto.Id)
+            if (id != editVehicleModel.Id)
             {
                 return NotFound();
             }
@@ -133,17 +135,17 @@ namespace Cars.Controllers
             {
                 try
                 {
-                    
-                    await _carService.UpdateVehicleModelAsync(vehicleModelDto);                   
+                    var vehicleModel = _mapper.Map<EditVehicleModel, VehicleModel>(editVehicleModel);
+                    await _carService.UpdateVehicleModelAsync(vehicleModel);                   
                     
                 }
                 catch (Exception)
                 {
                     return RedirectToAction("Error", "Home");
                 }
-                return RedirectToAction(nameof(Index), new { makeId = vehicleModelDto.MakeId });
+                return RedirectToAction(nameof(Index), new { makeId = editVehicleModel.MakeId });
             }
-            return View(vehicleModelDto);
+            return View(editVehicleModel);
             
         }
 
@@ -157,7 +159,8 @@ namespace Cars.Controllers
             try
             {
                 var vehicleModel = await _carService.GetVehicleModelAsync(id);
-                return View(vehicleModel);
+                var deleteVehicleModel = _mapper.Map<VehicleModel, DeleteVehicleModel>(vehicleModel);
+                return View(deleteVehicleModel);
             }
 
                    catch(Exception)
@@ -170,14 +173,14 @@ namespace Cars.Controllers
         // POST: VehicleModels/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id, [Bind("Id,Name,Abrv,MakeId")] VehicleModelDto vehicleModelDto)
+        public async Task<IActionResult> DeleteConfirmed(int id, [Bind("Id,Name,Abrv,MakeId")] VehicleModel vehicleModel)
         {
             
             try
             {
-                await _carService.DeleteVehicleModelAsync(id);
+                await _carService.DeleteVehicleModelAsync(id);                
 
-                return RedirectToAction(nameof(Index), new { makeId = vehicleModelDto.MakeId });
+                return RedirectToAction(nameof(Index), new { makeId = vehicleModel.MakeId });
 
             }
                  
