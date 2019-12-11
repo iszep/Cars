@@ -21,24 +21,25 @@ namespace Cars.Controllers
     public class VehicleMakeController : Controller
     {
 
-        private readonly ICarService _carService;
+        private readonly IVehicleMakeService _vehicleMakeService;
         private readonly IMapper _mapper;
         private readonly int _pageSize = 5;
         IConfigurationProvider _cfg;
 
-        public VehicleMakeController(ICarService carService, IMapper mapper, IConfigurationProvider cfg)
+        public VehicleMakeController(IVehicleMakeService vehicleMakeService, IMapper mapper, IConfigurationProvider cfg)
         {
 
-            _carService = carService;
+            _vehicleMakeService = vehicleMakeService;
             _mapper = mapper;
             _cfg = cfg;
         }
 
         public async Task<IActionResult> Index(int pageindex = 1, string sort = "Name", string search = "")
         {
+            
             var queryParams = new VehicleMakeQuery { PageIndex = pageindex, Sort = sort, Search = search, PageSize = _pageSize };
 
-            var query = _carService.GetVehicleMakesPaged(queryParams).ProjectTo<IndexVehicleMake>(_cfg);
+            var query = _vehicleMakeService.GetVehicleMakesPaged(queryParams).ProjectTo<IndexVehicleMake>(_cfg);
             var page = await PagingList.CreateAsync(query, queryParams.PageSize, queryParams.PageIndex, queryParams.Sort, queryParams.Sort);
 
             page.RouteValue = new RouteValueDictionary
@@ -61,7 +62,7 @@ namespace Cars.Controllers
 
             {
                 
-                var vehicleMake = await _carService.GetVehicleMakeAsync(id);
+                var vehicleMake = await _vehicleMakeService.GetVehicleMakeAsync(id);
                 var detailsVehicleMake = _mapper.Map<VehicleMake, DetailsVehicleMake>(vehicleMake);
                 return View(detailsVehicleMake);
 
@@ -92,7 +93,7 @@ namespace Cars.Controllers
                 try
                 {
                     var vehicleMake = _mapper.Map<CreateVehicleMake, VehicleMake>(createVehicleMake);
-                    var numberOfSaves = await _carService.CreateVehicleMakeAsync(vehicleMake);
+                    var numberOfSaves = await _vehicleMakeService.CreateVehicleMakeAsync(vehicleMake);
                     return RedirectToAction(nameof(Index));
                 }
                 catch(Exception)
@@ -116,7 +117,7 @@ namespace Cars.Controllers
 
             try
             {
-                var vehicleMake = await _carService.GetVehicleMakeAsync(id);
+                var vehicleMake = await _vehicleMakeService.GetVehicleMakeAsync(id);
                 var editVehicleMake = _mapper.Map<VehicleMake, EditVehicleMake>(vehicleMake);
                 return View(editVehicleMake);
             }
@@ -144,7 +145,7 @@ namespace Cars.Controllers
                 try
                 {
                     var vehicleMake = _mapper.Map<EditVehicleMake, VehicleMake>(editVehicleMake);
-                    var numberOfChanges = await _carService.UpdateVehicleMakeAsync(vehicleMake);
+                    var numberOfChanges = await _vehicleMakeService.UpdateVehicleMakeAsync(vehicleMake);
                 }
                 catch (Exception)
                 {
@@ -165,7 +166,7 @@ namespace Cars.Controllers
             }
             try
             {
-                var vehicleMake = await _carService.GetVehicleMakeAsync(id);
+                var vehicleMake = await _vehicleMakeService.GetVehicleMakeAsync(id);
                 var deleteVehicleMake = _mapper.Map<VehicleMake, DeleteVehicleMake>(vehicleMake);
                 return View(deleteVehicleMake);
             }
@@ -185,7 +186,7 @@ namespace Cars.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             try { 
-            var vehicleMake = await _carService.DeleteVehicleMakeAsync(id);
+            var vehicleMake = await _vehicleMakeService.DeleteVehicleMakeAsync(id);
                 return RedirectToAction(nameof(Index));
             }
             catch(Exception)

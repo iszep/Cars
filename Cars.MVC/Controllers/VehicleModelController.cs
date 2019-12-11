@@ -16,11 +16,11 @@ namespace Cars.Controllers
 {
     public class VehicleModelController : Controller
     {
-         private readonly ICarService _carService; IMapper _mapper;
+         private readonly IVehicleModelService _vehicleModelService; IMapper _mapper;
 
-        public VehicleModelController(ICarService carService, IMapper mapper)
+        public VehicleModelController(IVehicleModelService vehicleModelService, IMapper mapper)
         {           
-            _carService = carService;
+            _vehicleModelService = vehicleModelService;
             _mapper = mapper;
         }
 
@@ -29,7 +29,7 @@ namespace Cars.Controllers
         {
 
             ViewBag.MakeId = makeId;
-            var vehicleModel = await _carService.GetVehicleModelAsync(makeId);
+            var vehicleModel = await _vehicleModelService.GetVehicleModelAsync(makeId);
             var indexVehicleModel = _mapper.Map<IEnumerable<VehicleModel>, IEnumerable<IndexVehicleModel>>(vehicleModel);
 
             return View(indexVehicleModel);
@@ -45,7 +45,7 @@ namespace Cars.Controllers
             }
             try
             {
-                var vehicleModel = await _carService.GetVehicleModelAsync(id);
+                var vehicleModel = await _vehicleModelService.GetVehicleModelAsync(id);
                 var detailsVehicleModel = _mapper.Map<VehicleModel, DetailsVehicleModel>(vehicleModel);
                 return View(detailsVehicleModel);
             }
@@ -78,7 +78,7 @@ namespace Cars.Controllers
                 try
                 {
                     var vehicleModel = _mapper.Map<CreateVehicleModel, VehicleModel>(createVehicleModel);
-                    var numberOfSaves = await _carService.CreateVehicleModelAsync(vehicleModel);                
+                    var numberOfSaves = await _vehicleModelService.CreateVehicleModelAsync(vehicleModel);                
                 return RedirectToAction(nameof(Index), new { makeId = vehicleModel.MakeId });
                 }
                 catch (Exception)
@@ -102,9 +102,9 @@ namespace Cars.Controllers
             try
             { 
            
-            var vehicleModel = await _carService.GetVehicleModelAsync(id);
+            var vehicleModel = await _vehicleModelService.GetVehicleModelAsync(id);
             var editVehicleModel = _mapper.Map<VehicleModel, EditVehicleModel>(vehicleModel);
-            var vehicleMake = await _carService.GetVehicleMakeAsync(vehicleModel.MakeId);
+            var vehicleMake = await _vehicleModelService.GetVehicleMakeAsync(vehicleModel.MakeId);
             ViewBag.VehicleMakeName = vehicleMake.Name;
                 return View(editVehicleModel);
 
@@ -136,7 +136,7 @@ namespace Cars.Controllers
                 try
                 {
                     var vehicleModel = _mapper.Map<EditVehicleModel, VehicleModel>(editVehicleModel);
-                    await _carService.UpdateVehicleModelAsync(vehicleModel);                   
+                    await _vehicleModelService.UpdateVehicleModelAsync(vehicleModel);                   
                     
                 }
                 catch (Exception)
@@ -158,7 +158,7 @@ namespace Cars.Controllers
             }
             try
             {
-                var vehicleModel = await _carService.GetVehicleModelAsync(id);
+                var vehicleModel = await _vehicleModelService.GetVehicleModelAsync(id);
                 var deleteVehicleModel = _mapper.Map<VehicleModel, DeleteVehicleModel>(vehicleModel);
                 return View(deleteVehicleModel);
             }
@@ -178,7 +178,7 @@ namespace Cars.Controllers
             
             try
             {
-                await _carService.DeleteVehicleModelAsync(id);                
+                await _vehicleModelService.DeleteVehicleModelAsync(id);                
 
                 return RedirectToAction(nameof(Index), new { makeId = vehicleModel.MakeId });
 
@@ -192,7 +192,7 @@ namespace Cars.Controllers
 
         private bool VehicleModelExists(int id)
         {
-            _carService.VehicleModelExists(id);
+            _vehicleModelService.VehicleModelExists(id);
             return true;
         }
 

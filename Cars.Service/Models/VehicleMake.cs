@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using Cars.Service.Interfaces;
 
 namespace Cars.Service.Models
 {
-    public class VehicleMake
+    public class VehicleMake : IVehicleMake
     {
         public VehicleMake()
         {

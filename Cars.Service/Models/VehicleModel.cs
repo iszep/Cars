@@ -4,10 +4,11 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
+using Cars.Service.Interfaces;
 
 namespace Cars.Service.Models
 {
-    public class VehicleModel
+    public class VehicleModel : IVehicleModel
     {
         public int Id { get; set; }
         

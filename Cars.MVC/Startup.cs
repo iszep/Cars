@@ -16,6 +16,7 @@ using Cars.Service.Services;
 using Cars.Service.Interfaces;
 using AutoMapper;
 using ReflectionIT.Mvc.Paging;
+using Cars.Service.Models;
 
 namespace Cars
 {
@@ -39,12 +40,16 @@ namespace Cars
                 .AddEntityFrameworkStores<ApplicationDbContext>();
             services.AddControllersWithViews();
             services.AddRazorPages();
-            services.AddTransient<ICarService,CarService>();
+            services.AddTransient<IVehicleMakeService,VehicleMakeService>();
+            services.AddTransient<IVehicleModelService, VehicleModelService>();
+            services.AddTransient<IVehicleModel, VehicleModel>();
+            services.AddTransient<IVehicleMake, VehicleMake>();
             services.AddTransient<IAuthService, AuthService>();
             services.AddAutoMapper(typeof(Startup));
              services.AddPaging(options => {
                 options.ViewName = "Bootstrap4";
                 options.PageParameterName = "pageindex";
+                 options.SortExpressionParameterName = "sort";
             });
         }
 
